@@ -1,5 +1,4 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/c7ekg1bix79434tm?svg=true)](https://ci.appveyor.com/project/Himura2la/festengine)
-[![Build Status](https://travis-ci.org/Himura2la/FestEngine.svg?branch=master)](https://travis-ci.org/Himura2la/FestEngine)
 [![](etc/gitter_shield.svg)](https://gitter.im/FestEngine/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 
 Сидел я однажды на региональном Аниме-фесте, смотрел как на проекторе мышкой таскают файлы и осознал что *хватит это терпеть!*
@@ -23,12 +22,12 @@
 
 Как это у других, лучше не знать... Мало кто отключает системные звуки даже, а мышка бегающая по экрану проектора и интерфейсы винды -- это в порядке вещей.
 
-Есть, конечно, такой софт как [Resolume Arena](https://resolume.com/), но:
+Ближайшие аналоги:
 
-1. Это сверх-мега-убер-дорого (если не пиратить)
-2. Это сильно менее гибко. Каждую сцену надо настраивать отдельно вручную, задники и треки на разных слоях держать, никаких переносов и поиска, от названий видны только номера и превьюхи...
-4. Каждую сцену надо настраивать отдельно вручную! Еще раз! С этим очень легко ошибиться и впилить кому-нибудь неверный задник или трек. В FestEngine абсолютно всё завязано на именах файлов, так что можно довериться продуманным скриптам и включать номера спокойно.
-3. Управление завязано на мышку. Я даже не уверен, что MIDI-контроллер спасёт, ибо на фестах никогда всё не идёт по плану, гибкость крайне важна. Просто включать сцены подряд не прокатит.
+* [QLab](https://qlab.app/)
+* [Show Cue System](https://www.showcuesystems.com/cms/)
+* [Resolume Arena](https://resolume.com/)
+* [Linux Show Player](https://github.com/FrancescoCeruti/linux-show-player) (только аудио)
 
 
 # Как это теперь:
@@ -58,7 +57,7 @@
 
 ![настройки](etc/settings.png)
 
-### [Пошаговая инструкция по применению](https://github.com/Himura2la/FestEngine/wiki/%D0%9A%D0%B0%D0%BA-%D0%BD%D0%B0%D1%87%D0%B0%D1%82%D1%8C-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D1%8C-Fest-Engine%3F)
+### [Пошаговая инструкция по применению](https://github.com/Himura2la/FestEngine/wiki)
 
 # На чём это зиждется?
 
@@ -118,6 +117,17 @@ sudo -H pip3 install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/
 git clone https://github.com/Himura2la/FestEngine.git
 cd FestEngine/src/locale && ./msgfmt.sh && cd ..
 python3 main.pyw
+```
+
+## CentOS 8
+
+```
+python3 -m venv .venv
+. .venv/bin/activate
+pip3 install --upgrade pip setuptools
+pip3 install python-vlc
+pip3 install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/centos-8/wxPython-4.1.0-cp36-cp36m-linux_x86_64.whl wxPython
+sudo dnf install SDL
 ```
 
 # Кто это использует?

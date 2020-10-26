@@ -57,13 +57,14 @@ docs/_build/
 # PyBuilder
 target/
 
-\.idea/
+# Python virtual environment
+.venv
 
+.idea/
 bin/FestEngine*
 out/
 
-src/last_fest\.txt
-
-*.fest
-
-*.fest_bkp
+**/last_fest.txt
+**.fest
+**.fest_bkp
+**/*.tar.gz

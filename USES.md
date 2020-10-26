@@ -15,3 +15,19 @@
 | [Mira Kamen Convention 2018](https://vk.com/mkfest) | Калуга | 17 ноября 2018г. | [Toki-chan](https://vk.com/toki__chan) |
 | [Tatakae! 3+1](https://vk.com/tata4old) | Старый Оскол | 12 января 2019г. | [@Himura2la](https://github.com/Himura2la) |
 | [Yuki no Odori 8](https://vk.com/tulaanimefest) | Тула | 2 февраля 2019г. | [@Himura2la](https://github.com/Himura2la) |
+| [Neko Challenge! Anime Party](https://vk.com/remagiroparty) | Липецк | 13 апреля 2019г. | [littledrunkflower](https://vk.com/littledrunkflower) |
+| [AtomCosCon 2019](https://vk.com/cosfest) | Дубна (МО) | 15 июня 2019г. | [Airslasher](https://vk.com/courier_from_vegas) |
+| [CROSSxOVER 2019](https://vk.com/crossxover42) | Кемерово | 15 июня 2019г. | [@oreolek](https://github.com/oreolek) |
+| [ANI-SHINAI 2019](https://anishinai.cosplay2.ru/) ([VK](https://vk.com/anishinai))| Калуга | 20 июля 2019г. | [@Himura2la](https://github.com/Himura2la) |
+| [Косплей-дефиле на UnityCon 2019](http://unitycon.ru) ([VK](https://vk.com/unitycon)) | Москва | 10 августа 2019 г. | [@Himura2la](https://github.com/Himura2la) |
+| [Фестиваль «ВОЛНА-2»](https://vk.com/volna2_fest) | Москва | 11 августа 2019 г. | [@namikiri](https://github.com/namikiri) |
+| [ГРЕЧА-фест 2019](https://vk.com/grechafest2019) | Брянск | 10 августа 2019г. | [@Ocakypo](https://github.com/Ocakypo) |
+| [Hokori Tori 2019](https://vk.com/hokori_tori) | Орёл | 17 августа 2019 г. | [@Himura2la](https://github.com/Himura2la) |
+| [Gakko XI](http://gakko-fest.ru/) ([VK](https://vk.com/gakko_official)) | Белгород | 24 августа 2019 г. | [@Himura2la](https://github.com/Himura2la) |
+| [REMAGIRO](https://remagiro.cosplay2.ru/) ([VK](https://vk.com/remagiro)) | Липецк | 31 августа 2019 г. | [littledrunkflower](https://vk.com/littledrunkflower) |
+| [Kyoto anifest](https://vk.com/kyotoanifest2019) | Курск | 16 ноября 2019 г. | [Михо](https://vk.com/mihomihovna) |
+| [Tatakae! Дай 5!](https://vk.com/tata5old) | Старый Оскол | 30.11, 1.12.2019 | [@Himura2la](https://github.com/Himura2la) |
+| [AnyFest 2019](https://vk.com/anyfest) | Брянск | 7 декабря 2019г. | [@Ocakypo](https://github.com/Ocakypo) |
+| [Yuki no Odori 9](https://vk.com/tulaanimefest) | Тула | 1 февраля 2020г. | [@Himura2la](https://github.com/Himura2la) |
+| [Главная сцена на DatFest 2020](http://datfest.ru) ([VK](https://vk.com/datfest)) | Москва | 14 марта 2020г. | [@Himura2la](https://github.com/Himura2la) |
+| [GAKKO 12](https://vk.com/gakko_official) | Белгород | 29 августа 2020г. | [@Himura2la](https://github.com/Himura2la) |

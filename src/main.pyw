@@ -21,10 +21,11 @@ import wx.grid
 from background_music_player import BackgroundMusicPlayer
 from constants import Config, Colors, Columns, FileTypes, Strings
 from projector import ProjectorWindow
-from settings import SettingsDialog, path_make_abs
+from settings import SettingsDialog
 from logger import Logger
 from file_replacer import FileReplacer
 from text_window import TextWindow
+from os_tools import path
 
 locale_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'locale')
 if os.path.isfile(os.path.join(locale_dir, 'ru', 'LC_MESSAGES', 'main.mo')):
@@ -66,23 +67,22 @@ class MainWindow(wx.Frame):
                        Config.COUNTDOWN_TIME_FMT: u"Ждём Вас в %s ^_^"}
 
         self.config_ok = False
-        self.session_file_path = ''
+        self.fest_file_path = ''
         if os.path.isfile(Config.LAST_SESSION_PATH):
             try:
-                self.session_file_path = open(Config.LAST_SESSION_PATH, 'r', encoding='utf-8-sig').read()
-            except UnicodeDecodeError as e:
+                self.fest_file_path = open(Config.LAST_SESSION_PATH, 'r', encoding='utf-8-sig').read()
+            except UnicodeDecodeError:
                 try:
-                    self.session_file_path = open(Config.LAST_SESSION_PATH, 'r', encoding='latin-1').read()
-                except UnicodeDecodeError as e:
+                    self.fest_file_path = open(Config.LAST_SESSION_PATH, 'r', encoding='latin-1').read()
+                except UnicodeDecodeError:
                     print("Fail to read last session file.")
-                    self.session_file_path = ''
+                    self.fest_file_path = ''
 
-            if not os.path.isabs(self.session_file_path):
-                self.session_file_path = os.path.normpath(os.path.join(os.path.abspath(__file__), self.session_file_path))
+            self.fest_file_path = path.make_abs(self.fest_file_path)
 
-            if os.path.isfile(self.session_file_path):
+            if os.path.isfile(self.fest_file_path):
                 try:
-                    loaded_config = json.load(open(self.session_file_path, 'r', encoding='utf-8-sig'))
+                    loaded_config = json.load(open(self.fest_file_path, 'r', encoding='utf-8-sig'))
                     config_keys_diff = set(base_config.keys()) - set(loaded_config.keys())
                     if config_keys_diff:
                         self.logger.log("[WARNING] Config file is missing the following keys: " + str(config_keys_diff))
@@ -91,8 +91,13 @@ class MainWindow(wx.Frame):
                 except json.decoder.JSONDecodeError as e:
                     msg = _("Unfortunately, you broke the JSON format...\n"
                             "Please fix the configuration file%s ASAP.\n\nDetails: %s") % \
-                          ("\n(%s)" % self.session_file_path, str(e))
+                          ("\n(%s)" % self.fest_file_path, str(e))
                     wx.MessageBox(msg, "JSON Error", wx.OK | wx.ICON_ERROR, self)
+            else:
+                self.logger.log("Session path %s is not file" % self.fest_file_path)
+                self.fest_file_path = ''
+
+        path.fest_file = self.fest_file_path  # TODO: Remove self.fest_file_path
 
         if not self.config_ok:
             self.config = base_config
@@ -117,7 +122,7 @@ class MainWindow(wx.Frame):
         self.Bind(wx.EVT_TIMER, self.on_background_timer, self.bg_player_timer)
 
         self.bg_tracks_dir = None
-        self.files_dirs = [path_make_abs(d, self.session_file_path) for d in self.config[Config.FILES_DIRS]]
+        self.files_dirs = [path.make_abs(d, path.fest_file) for d in self.config[Config.FILES_DIRS]]
 
         # ------------------ Menu ------------------
         menu_bar = wx.MenuBar()
@@ -130,8 +135,8 @@ class MainWindow(wx.Frame):
 
         menu_file.AppendSeparator()
 
-        if self.session_file_path:
-            session_folder, session_file = os.path.split(self.session_file_path)
+        if self.fest_file_path:
+            session_folder, session_file = os.path.split(self.fest_file_path)
             self.Bind(wx.EVT_MENU, lambda e: webbrowser.open(os.path.abspath(session_folder)),
                       menu_file.Append(wx.ID_ANY, _("Open &Folder with '%s'") % session_file))
 
@@ -161,7 +166,6 @@ class MainWindow(wx.Frame):
         self.end_show_on_bg.Check(False)
 
         self.auto_zad = menu_file.Append(wx.ID_ANY, _("Auto Show &ZAD with Sound"), kind=wx.ITEM_CHECK)
-        self.auto_zad.Check(True)
 
         menu_file.AppendSeparator()
 
@@ -340,7 +344,7 @@ class MainWindow(wx.Frame):
         self.grid.HideRowLabels()
         self.grid.DisableDragRowSize()
         self.grid.SetColLabelSize(20)
-        self.grid.SetSelectionMode(wx.grid.Grid.wxGridSelectRows)
+        self.grid.SetSelectionMode(wx.grid.Grid.GridSelectRows)
 
         def select_row(e):
             if not e.Selecting() or hasattr(e, 'TopRow') and e.TopRow == e.BottomRow:
@@ -515,15 +519,16 @@ class MainWindow(wx.Frame):
 
     def on_settings(self, e=None):
         prev_config = copy.copy(self.config)
-        with SettingsDialog(self.session_file_path, self.config, self) as settings_dialog:
+        with SettingsDialog(self.fest_file_path, self.config, self) as settings_dialog:
             action = settings_dialog.ShowModal()
 
-            self.session_file_path = settings_dialog.session_file_path  # To be sure.
+            self.fest_file_path = path.make_abs(settings_dialog.fest_file_path)  # To be sure.
+            path.fest_file = self.fest_file_path
             self.config = settings_dialog.config                        # Maybe redundant
             self.config_ok = action in {wx.ID_SAVE, wx.ID_OPEN}
 
         if prev_config != self.config:  # Safety is everything!
-            bkp_name = "%s-%s.bkp.fest" % (os.path.splitext(self.session_file_path)[0],
+            bkp_name = "%s-%s.bkp.fest" % (os.path.splitext(self.fest_file_path)[0],
                                            time.strftime("%d%m%y%H%M%S", time.localtime()))
             json.dump(prev_config, open(bkp_name, 'w', encoding='utf-8'),
                       ensure_ascii=False, indent=4)
@@ -602,18 +607,31 @@ class MainWindow(wx.Frame):
         self.proj_win.switch_to_images()
 
     def show_zad(self, e=None):
+        self.ensure_proj_win()
         if self.get_num(self.grid.GetGridCursorRow()) == 'countdown':
             self.play_async()
             return
 
         def delayed_run():
-            self.switch_to_zad()
             num = self.get_num(self.grid.GetGridCursorRow())
             try:
                 file_path = [f[1] for f in self.data[num]['files'].items() if f[0] in FileTypes.img_extensions][0]
-                self.proj_win.load_zad(file_path, True)
+                if any([file_path.endswith(e) for e in FileTypes.video_extensions]):
+                    self.switch_to_vid()
+                    self.player.set_media(self.vlc_instance.media_new(file_path))
+                    while not self.set_vlc_video_panel():
+                        pass
+                    self.player.audio_set_mute(False)
+                    self.player.audio_set_volume(self.vol_control.GetValue())
+                    if self.player.play() != 0:  # [Play] button is pushed here!
+                        wx.CallAfter(lambda: self.image_status(u"Video ZAD FAILED №%s" % num))
+                        return
+                else:
+                    self.switch_to_zad()
+                    self.proj_win.load_zad(file_path, True)
                 self.image_status(u"Showing №%s" % num)
                 self.status("ZAD Fired!")
+                wx.CallAfter(lambda: self.proj_win.Layout())
             except IndexError:
                 self.clear_zad(status=u"No ZAD for №%s" % num)
 
@@ -627,7 +645,8 @@ class MainWindow(wx.Frame):
             return
         self.proj_win.switch_to_images()
         if self.config[Config.BG_ZAD_PATH] and not no_show:
-            self.proj_win.load_zad(path_make_abs(self.config[Config.BG_ZAD_PATH], self.session_file_path), True)
+            self.proj_win.load_zad(path.make_abs(self.config[Config.BG_ZAD_PATH],
+                                                 path.fest_file), True)
             self.image_status("Background")
         else:
             self.proj_win.no_show()
@@ -689,8 +708,13 @@ class MainWindow(wx.Frame):
         all_files = [item for sublist in all_files for item in sublist]  # Flatten
 
         for file_path in all_files:
+            if not os.path.isfile(file_path):
+                continue
             name, ext = os.path.basename(file_path).rsplit('.', 1)
-            ext = ext.lower()  # Never forget doing this!
+            ext = ext.lower()
+            if name.endswith(".zad"):
+                ext = "zad." + ext
+                name = name[:-4]
             match = re.search(self.filename_re, name)
             if not match:
                 self.logger.log(_("[WARNING] File %s does not match filename_re") % file_path)
@@ -738,7 +762,7 @@ class MainWindow(wx.Frame):
 
         self.add_countdown_row(False, 0, self.config[Config.COUNTDOWN_OPENING_TEXT])
 
-        self.SetLabel("%s: %s" % (Strings.APP_NAME, self.session_file_path))
+        self.SetLabel("%s: %s" % (Strings.APP_NAME, self.fest_file_path))
 
         self.load_data_item.Enable(False)  # Safety is everything!
 
@@ -929,6 +953,9 @@ class MainWindow(wx.Frame):
 
     def play_async(self, e=None):
         num = self.get_num(self.grid.GetGridCursorRow())
+        if self.is_playing and self.num_in_player == num:
+            self.status(_("ALREADY PLAYING! Hit Esc to restart!"))
+            return
         if num == 'countdown':
             notes = self.grid.GetCellValue(self.grid.GetGridCursorRow(), self.grid_cols.index(Columns.NOTES))
             self.ensure_proj_win()
@@ -1111,6 +1138,7 @@ class MainWindow(wx.Frame):
         else:  # Not playing
             self.time_bar.SetValue(0)
             self.time_label.SetLabel('Stop')
+            self.player_status = self.player_state_parse(self.player.get_state())
             self.switch_to_zad()
 
             if self.grid.GetCellBackgroundColour(self.current_playing_row, 0) != Colors.ROW_SKIPPED:
@@ -1131,7 +1159,7 @@ class MainWindow(wx.Frame):
     # -------------------------------------------- Background Music Player --------------------------------------------
 
     def on_bg_load_files(self, e=None):
-        self.bg_tracks_dir = path_make_abs(self.config[Config.BG_TRACKS_DIR], self.session_file_path)
+        self.bg_tracks_dir = path.make_abs(self.config[Config.BG_TRACKS_DIR], path.fest_file)
         if not self.config[Config.BG_TRACKS_DIR] or not os.path.isdir(self.bg_tracks_dir):
             msg = _("Background MP3 path is invalid. Please specify a\n"
                     "valid path with your background tracks in settings.\n\n"
@@ -1249,7 +1277,7 @@ class MainWindow(wx.Frame):
             if Config.C2_DATABASE_PATH not in self.config or not self.config[Config.C2_DATABASE_PATH]:
                 self.status(_("No Cosplay2 database in config"))
                 return
-            db_path = path_make_abs(self.config[Config.C2_DATABASE_PATH], self.session_file_path)
+            db_path = path.make_abs(self.config[Config.C2_DATABASE_PATH], path.fest_file)
             if not os.path.isfile(db_path):
                 self.status(_("Cosplay2 database not found"))
                 return
